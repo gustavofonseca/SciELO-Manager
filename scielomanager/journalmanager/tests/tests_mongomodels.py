@@ -4,6 +4,8 @@ import pymongo
 from mocker import (
     MockerTestCase,
     ANY,
+    ARGS,
+    KWARGS,
 )
 
 
@@ -75,6 +77,7 @@ class ArticleModelTest(TestCase, MockerTestCase):
         mongo_driver = self.mocker.mock()
         mongo_conn = self.mocker.mock()
         mongo_db = self.mocker.mock(pymongo.database.Database)
+        mongo_col = self.mocker.mock()
 
         mongo_driver.Connection(host=ANY, port=ANY)
         self.mocker.result(mongo_conn)
@@ -84,6 +87,9 @@ class ArticleModelTest(TestCase, MockerTestCase):
 
         mongo_db.authenticate(ANY, ANY)
         self.mocker.result(None)
+
+        mongo_db['articles']
+        self.mocker.result(mongo_col)
 
         self.mocker.replay()
 
@@ -98,3 +104,37 @@ class ArticleModelTest(TestCase, MockerTestCase):
 
         self.assertEqual(a.title,
             'Micronucleated lymphocytes in parents of lalala children')
+
+    def test_save_a_new_document(self):
+        mongo_driver = self.mocker.mock()
+        mongo_conn = self.mocker.mock()
+        mongo_db = self.mocker.mock(pymongo.database.Database)
+        mongo_col = self.mocker.mock()
+
+        mongo_driver.Connection(host=ANY, port=ANY)
+        self.mocker.result(mongo_conn)
+
+        mongo_conn[ANY]
+        self.mocker.result(mongo_db)
+
+        mongo_db.authenticate(ANY, ANY)
+        self.mocker.result(None)
+
+        mongo_db['articles']
+        self.mocker.result(mongo_col)
+
+        mongo_col.update(ARGS, KWARGS)
+        self.mocker.result('6f1ed002ab5595859014ebf0951522d9')
+
+        self.mocker.replay()
+
+        article_microdata = {
+            'title': 'Micronucleated lymphocytes in parents of lalala children'
+        }
+
+        mongo_uri = r'mongodb://user:pass@localhost:27017/journalmanager'
+        a = self._makeOne(mongodb_driver=mongo_driver,
+                          mongo_uri=mongo_uri,
+                          **article_microdata)
+
+        self.assertEqual(a.save(), '6f1ed002ab5595859014ebf0951522d9')

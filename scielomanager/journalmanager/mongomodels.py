@@ -66,6 +66,9 @@ class Article(MongoConnector):
             if param in kwargs:
                 init_args[param] = kwargs.pop(param)
 
+        if 'mongo_collection' not in init_args:
+            init_args['mongo_collection'] = 'articles'
+
         super(Article, self).__init__(**init_args)
 
         self._data = kwargs
@@ -77,3 +80,6 @@ class Article(MongoConnector):
             raise AttributeError(
                 "'%s' object has no attribute '%s'" % (self.__class__, name)
             )
+
+    def save(self):
+        return self.col.update(self._data, upsert=True, safe=True)
