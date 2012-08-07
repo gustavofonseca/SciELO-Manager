@@ -1,15 +1,16 @@
 # coding: utf-8
 import re
+
 from django import forms
-from django.forms import ModelForm, DateField
-from django.forms.models import inlineformset_factory
+from django.forms import ModelForm
 from django.forms.models import BaseInlineFormSet
 from django.utils.translation import ugettext_lazy as _
 
 from journalmanager import models
 from journalmanager import choices
+from journalmanager import formfields
 from scielo_extensions import formfields as fields
-from django.forms.util import ErrorList
+
 
 class UserCollectionContext(ModelForm):
     """
@@ -35,6 +36,7 @@ class UserCollectionContext(ModelForm):
         if collections_qset is not None:
             self.fields['collections'].queryset = models.Collection.objects.filter(
                 pk__in = (collection.collection.pk for collection in collections_qset))
+
 
 class JournalForm(UserCollectionContext):
     print_issn = fields.ISSNField(max_length=9, required=False)
@@ -101,31 +103,32 @@ class JournalForm(UserCollectionContext):
         exclude = ('pub_status', 'pub_status_changed_by')
         #Overriding the default field types or widgets
         widgets = {
-           'title': forms.TextInput(attrs={'class':'span9'}),
-           'title_iso': forms.TextInput(attrs={'class':'span9'}),
-           'short_title': forms.TextInput(attrs={'class':'span9'}),
-           'previous_title': forms.Select(attrs={'class':'span9'}),
-           'acronym': forms.TextInput(attrs={'class':'span2'}),
-           'scielo_issn': forms.Select(attrs={'class':'span3'}),
-           'subject_descriptors': forms.Textarea(attrs={'class':'span9'}),
-           'init_year': forms.TextInput(attrs={'class':'datepicker', 'id': 'datepicker0'}),
-           'init_vol': forms.TextInput(attrs={'class':'span1'}),
-           'init_num': forms.TextInput(attrs={'class':'span1'}),
-           'final_year': forms.TextInput(attrs={'class':'datepicker', 'id': 'datepicker1'}),
-           'final_vol': forms.TextInput(attrs={'class':'span1'}),
-           'final_num': forms.TextInput(attrs={'class':'span1'}),
-           'url_main_collection': forms.TextInput(attrs={'class':'span9'}),
-           'url_online_submission': forms.TextInput(attrs={'class':'span9'}),
-           'url_journal': forms.TextInput(attrs={'class':'span9'}),
-           'notes': forms.Textarea(attrs={'class':'span9'}),
-           'editorial_standard': forms.Select(attrs={'class':'span3'}),
-           'copyrighter': forms.TextInput(attrs={'class':'span8'}),
-           'index_coverage': forms.Textarea(attrs={'class':'span9'}),
-           'other_previous_title': forms.TextInput(attrs={'class':'span9'}),
+           'title': forms.TextInput(attrs={'class': 'span9'}),
+           'title_iso': forms.TextInput(attrs={'class': 'span9'}),
+           'short_title': forms.TextInput(attrs={'class': 'span9'}),
+           'previous_title': forms.Select(attrs={'class': 'span9'}),
+           'acronym': forms.TextInput(attrs={'class': 'span2'}),
+           'scielo_issn': forms.Select(attrs={'class': 'span3'}),
+           'subject_descriptors': forms.Textarea(attrs={'class': 'span9'}),
+           'init_year': forms.TextInput(attrs={'class': 'datepicker', 'id': 'datepicker0'}),
+           'init_vol': forms.TextInput(attrs={'class': 'span1'}),
+           'init_num': forms.TextInput(attrs={'class': 'span1'}),
+           'final_year': forms.TextInput(attrs={'class': 'datepicker', 'id': 'datepicker1'}),
+           'final_vol': forms.TextInput(attrs={'class': 'span1'}),
+           'final_num': forms.TextInput(attrs={'class': 'span1'}),
+           'url_main_collection': forms.TextInput(attrs={'class': 'span9'}),
+           'url_online_submission': forms.TextInput(attrs={'class': 'span9'}),
+           'url_journal': forms.TextInput(attrs={'class': 'span9'}),
+           'notes': forms.Textarea(attrs={'class': 'span9'}),
+           'editorial_standard': forms.Select(attrs={'class': 'span3'}),
+           'copyrighter': forms.TextInput(attrs={'class': 'span8'}),
+           'index_coverage': forms.Textarea(attrs={'class': 'span9'}),
+           'other_previous_title': forms.TextInput(attrs={'class': 'span9'}),
         }
 
+
 class CollectionForm(ModelForm):
-  
+
     def __init__(self, *args, **kwargs):
         super(CollectionForm, self).__init__(*args, **kwargs)
 
@@ -133,22 +136,23 @@ class CollectionForm(ModelForm):
         model = models.Collection
         exclude = ('collection', )
 
+
 class PublisherForm(UserCollectionContext):
 
     def __init__(self, *args, **kwargs):
         super(PublisherForm, self).__init__(*args, **kwargs)
-
 
     class Meta:
         model = models.Publisher
         exclude = ('acronym', 'country', 'state', 'city', 'address_number', 'address_complement',
             'zip_code', 'phone', 'fax', 'cel')
         widgets = {
-            'name': forms.TextInput(attrs={'class':'span6'}),
-            'complement': forms.Textarea(attrs={'class':'span6'}),
-            'address': forms.Textarea(attrs={'class':'span6'}),
-            'email': forms.TextInput(attrs={'class':'span6'}),
+            'name': forms.TextInput(attrs={'class': 'span6'}),
+            'complement': forms.Textarea(attrs={'class': 'span6'}),
+            'address': forms.Textarea(attrs={'class': 'span6'}),
+            'email': forms.TextInput(attrs={'class': 'span6'}),
         }
+
 
 class SponsorForm(UserCollectionContext):
 
@@ -161,16 +165,19 @@ class SponsorForm(UserCollectionContext):
             'zip_code', 'phone', 'fax', 'cel')
 
         widgets = {
-            'name': forms.TextInput(attrs={'class':'span6'}),
-            'complement': forms.Textarea(attrs={'class':'span6'}),
-            'address': forms.Textarea(attrs={'class':'span6'}),
-            'email': forms.TextInput(attrs={'class':'span6'}),
+            'name': forms.TextInput(attrs={'class': 'span6'}),
+            'complement': forms.Textarea(attrs={'class': 'span6'}),
+            'address': forms.Textarea(attrs={'class': 'span6'}),
+            'email': forms.TextInput(attrs={'class': 'span6'}),
         }
+
+
 class UserForm(ModelForm):
     class Meta:
         model = models.User
-        exclude = ('is_staff','is_superuser','last_login','date_joined',
+        exclude = ('is_staff', 'is_superuser', 'last_login', 'date_joined',
                    'user_permissions', 'email', 'password')
+
     def save(self, commit=True):
         user = super(UserForm, self).save(commit=False)
         #user.set_password(self.cleaned_data["password"])
@@ -180,14 +187,17 @@ class UserForm(ModelForm):
             self.save_m2m()
         return user
 
+
 class EventJournalForm(forms.Form):
     pub_status = forms.ChoiceField(widget=forms.Select, choices=choices.JOURNAL_PUBLICATION_STATUS)
     pub_status_reason = forms.CharField(widget=forms.Textarea)
 
+
 class PasswordChangeForm(forms.Form):
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'class':'span3'}))
-    new_password = forms.CharField(widget=forms.PasswordInput(attrs={'class':'span3'}))
-    new_password_again = forms.CharField(widget=forms.PasswordInput(attrs={'class':'span3'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'span3'}))
+    new_password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'span3'}))
+    new_password_again = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'span3'}))
+
 
 class IssueForm(ModelForm):
     section = forms.ModelMultipleChoiceField(models.Section.objects.none(),
@@ -195,7 +205,7 @@ class IssueForm(ModelForm):
          required=False)
 
     widgets = {
-        'section': forms.Select(attrs={'class':'span3'}),
+        'section': forms.Select(attrs={'class': 'span3'}),
     }
 
     def __init__(self, *args, **kwargs):
@@ -211,7 +221,6 @@ class IssueForm(ModelForm):
         if journal_id is not None:
             self.fields['section'].queryset = models.Section.objects.filter(journal=journal_id)
 
-
     def save_all(self, journal):
         issue = self.save(commit=False)
         issue.journal = journal
@@ -224,8 +233,9 @@ class IssueForm(ModelForm):
         model = models.Issue
         exclude = ('collection', 'journal', 'created', 'updated')
         widgets = {
-            'publication_date': forms.TextInput(attrs={'class':'datepicker', 'id': 'datepicker'}),
+            'publication_date': forms.TextInput(attrs={'class': 'datepicker', 'id': 'datepicker'}),
         }
+
 
 class SectionTitleForm(ModelForm):
     def __init__(self, *args, **kwargs):
@@ -244,6 +254,7 @@ class SectionTitleForm(ModelForm):
     class Meta:
         model = models.SectionTitle
         fields = ('title', 'language',)
+
 
 class SectionForm(ModelForm):
 
@@ -266,41 +277,50 @@ class SectionForm(ModelForm):
         model = models.Section
         exclude = ('journal',)
 
+
 class UserCollectionsForm(ModelForm):
     class Meta:
-      model = models.UserCollections
-      exclude = ('is_default', )
-      widgets = {
-        'collection':forms.Select(attrs={'class':'span8'}),
-      }
+        model = models.UserCollections
+        exclude = ('is_default', )
+        widgets = {
+            'collection': forms.Select(attrs={'class': 'span8'}),
+        }
+
 
 class JournalStudyAreaForm(ModelForm):
     class Meta:
-      model = models.JournalStudyArea
-      widgets = {
-        'studyarea':forms.TextInput(attrs={'class':'span10'}),
-      }
+        model = models.JournalStudyArea
+        widgets = {
+            'studyarea': forms.TextInput(attrs={'class': 'span10'}),
+        }
+
 
 class JournalMissionForm(ModelForm):
     class Meta:
-      model = models.JournalMission
-      widgets = {
-        'description':forms.Textarea(attrs={'class':'span6', 'rows':'3'}),
-      }
+        model = models.JournalMission
+        widgets = {
+            'description': forms.Textarea(attrs={'class': 'span6', 'rows': '3'}),
+        }
+
 
 class JournalTitleForm(ModelForm):
     class Meta:
-      model = models.JournalTitle
-      widgets = {
-        'title': forms.TextInput(attrs={'class':'span6'}),
-      }
+        model = models.JournalTitle
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'span6'}),
+        }
+
 
 class IssueTitleForm(ModelForm):
     class Meta:
-      model = models.IssueTitle
-      widgets = {
-        'title': forms.TextInput(attrs={'class':'span6'}),
-      }
+        model = models.IssueTitle
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'span6'}),
+        }
+
+
+class ArticleForm(forms.Form):
+    titles = formfields.ArticleTitleField(label=_('Titles'))
 
 
 ## Formsets ##

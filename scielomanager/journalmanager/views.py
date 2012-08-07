@@ -831,3 +831,16 @@ def trash_listing(request):
         'journalmanager/trash_listing.html',
         {'trashed_docs': trashed_docs_paginated, 'user_collections': user_collections},
         context_instance = RequestContext(request))
+
+
+def add_article(request, journal_id, issue_id):
+    article_form = ArticleForm()
+
+    if request.method == 'POST':
+        article_form = ArticleForm(request.POST)
+        import pdb; pdb.set_trace()
+
+    return render_to_response('journalmanager/add_article.html', {
+                              'form': article_form,
+                              'user_name': request.user.pk,
+                              }, context_instance=RequestContext(request))
