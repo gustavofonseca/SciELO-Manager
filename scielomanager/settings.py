@@ -71,7 +71,7 @@ MEDIA_ROOT  = os.path.join(PROJECT_PATH, 'static/media/')
 STATIC_URL = '/static/'
 MEDIA_URL  = '/static/media/'
 
-# Webassets 
+# Webassets
 ASSETS_ROOT = os.path.join(PROJECT_PATH, 'static/')
 ASSETS_URL = '/static/'
 ASSETS_DEBUG = False
@@ -149,6 +149,7 @@ INSTALLED_APPS = (
     'widget_tweaks',
     'tastypie',
     'django_assets',
+    'wtforms.ext.django',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (

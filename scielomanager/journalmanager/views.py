@@ -25,6 +25,7 @@ from django.utils.functional import curry
 from django.utils.html import escape
 
 from scielomanager import settings
+from scielomanager.journalmanager import articleforms
 from scielomanager.journalmanager import models
 from scielomanager.journalmanager.forms import *
 from scielomanager.tools import get_paginated
@@ -834,13 +835,21 @@ def trash_listing(request):
 
 
 def add_article(request, journal_id, issue_id):
-    article_form = ArticleForm()
+    article_form = articleforms.ArticleForm()
+
+    PageFormSet = inlineformset_factory(articleforms.ArticleForm,
+                                        articleforms.PagesForm,
+                                        form=articleforms.PagesForm,
+                                        extra=1,
+                                        can_delete=True)
 
     if request.method == 'POST':
         article_form = ArticleForm(request.POST)
-        import pdb; pdb.set_trace()
+    else:
+        page_formset = PageFormSet()
 
     return render_to_response('journalmanager/add_article.html', {
                               'form': article_form,
+                              'page_formset': page_formset,
                               'user_name': request.user.pk,
                               }, context_instance=RequestContext(request))
