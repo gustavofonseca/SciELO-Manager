@@ -28,6 +28,7 @@ from scielomanager import settings
 from scielomanager.journalmanager import articleforms
 from scielomanager.journalmanager import models
 from scielomanager.journalmanager.forms import *
+from django.forms.models import inlineformset_factory
 from scielomanager.tools import get_paginated
 from scielomanager.tools import get_referer_view
 from scielomanager.tools import PendingPostData
@@ -835,21 +836,15 @@ def trash_listing(request):
 
 
 def add_article(request, journal_id, issue_id):
-    article_form = articleforms.ArticleForm()
+    from wtforms import fields, form
 
-    PageFormSet = inlineformset_factory(articleforms.ArticleForm,
-                                        articleforms.PagesForm,
-                                        form=articleforms.PagesForm,
-                                        extra=1,
-                                        can_delete=True)
+    class PagesForm(form.Form):
+        first = fields.TextField()
+        last = fields.TextField()
 
-    if request.method == 'POST':
-        article_form = ArticleForm(request.POST)
-    else:
-        page_formset = PageFormSet()
+    class ArticleForm(form.Form):
+        pages = fields.FormField(PagesForm)
 
     return render_to_response('journalmanager/add_article.html', {
-                              'form': article_form,
-                              'page_formset': page_formset,
-                              'user_name': request.user.pk,
+                              'form': ArticleForm(),
                               }, context_instance=RequestContext(request))
