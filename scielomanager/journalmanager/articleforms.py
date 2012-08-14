@@ -1,60 +1,67 @@
 # coding: utf-8
 
-from django import (
-    forms,
+from wtforms import (
+    fields,
+    form
 )
 
 
-# class AbstractForm(forms.Form):
-#     language = forms.SelectField('Language', choices=[('pt', 'Portuguese')])
-#     abstract = forms.CharField('Title')
+class AbstractForm(form.Form):
+    language = fields.SelectField('Language', choices=[('pt', 'Portuguese')])
+    abstract = fields.TextField('Title')
 
 
-# class DatesForm(forms.Form):
-#     thesis = forms.DateField()
-#     conference = forms.DateField()
-#     publication = forms.DateField()
-#     revision = forms.DateField()
+class DatesForm(form.Form):
+    thesis = fields.DateField()
+    conference = fields.DateField()
+    publication = fields.DateField()
+    revision = fields.DateField()
 
 
-class PagesForm(forms.Form):
-    first = forms.IntegerField()
-    last = forms.IntegerField()
+class PagesForm(form.Form):
+    first = fields.IntegerField()
+    last = fields.IntegerField()
 
 
-# class AffiliationForm(forms.Form):
-#     name = forms.CharField('Name')
-#     divisions = forms.FieldList(forms.CharField(),
-#                                  min_entries=1)
+class AffiliationForm(form.Form):
+    name = fields.TextField('Name')
+    divisions = fields.FieldList(fields.TextField(),
+                                 min_entries=1)
 
 
-# class AnalyticalAuthorForm(forms.Form):
-#     firstname = forms.CharField('Firstname')
-#     lastname = forms.CharField('Lastname')
-#     role = forms.SelectField('Role', choices=[('coord', 'Coordinator')])
-#     affiliations = forms.FieldList(forms.FormField(AffiliationForm),
-#                                     min_entries=1)
+class AnalyticalAuthorForm(form.Form):
+    firstname = fields.TextField('Firstname')
+    lastname = fields.TextField('Lastname')
+    role = fields.SelectField('Role', choices=[('coord', 'Coordinator')])
+    affiliations = fields.FieldList(fields.FormField(AffiliationForm),
+                                    min_entries=1)
 
 
-# class CorporateAuthorForm(forms.Form):
-#     name = forms.CharField('Name')
-#     divisions = forms.FieldList(forms.CharField(),
-#                                  min_entries=1)
+class CorporateAuthorForm(form.Form):
+    name = fields.TextField('Name')
+    divisions = fields.FieldList(fields.TextField(),
+                                 min_entries=1)
 
 
-# class TitleForm(forms.Form):
-#     language = forms.SelectField('Language', choices=[('pt', 'Portuguese')])
-#     title = forms.CharField('Title')
+class TitleForm(form.Form):
+    language = fields.SelectField('Language', choices=[('pt', 'Portuguese')])
+    title = fields.TextField('Title')
 
 
-class ArticleForm(forms.Form):
-    language = forms.CharField('Language')
-    publication_city = forms.CharField('City of publication')
-    publication_state = forms.CharField('State of publication')
-    publication_country = forms.CharField('Country of publication')
-    doctopic = forms.CharField('Doctopic')
-    created_at = forms.DateField()
-    bibliographic_standard = forms.CharField('Bibliographic standard')
-    sponsor = forms.CharField()
-    type_literature = forms.CharField('Type of literature')
-    pid = forms.CharField('PID')
+class ArticleForm(form.Form):
+    analytical_authors = fields.FieldList(fields.FormField(AnalyticalAuthorForm))
+    corporate_authors = fields.FieldList(fields.FormField(CorporateAuthorForm))
+    titles = fields.FieldList(fields.FormField(TitleForm))
+    pages = fields.FormField(PagesForm)
+    language = fields.TextField('Language')
+    dates = fields.FormField(DatesForm)
+    publication_city = fields.TextField('City of publication')
+    publication_state = fields.TextField('State of publication')
+    publication_country = fields.TextField('Country of publication')
+    doctopic = fields.TextField('Doctopic')
+    abstracts = fields.FieldList(fields.FormField(AbstractForm))
+    created_at = fields.DateField()
+    bibliographic_standard = fields.TextField('Bibliographic standard')
+    sponsor = fields.TextField()
+    type_literature = fields.TextField('Type of literature')
+    pid = fields.TextField('PID')

@@ -836,15 +836,8 @@ def trash_listing(request):
 
 
 def add_article(request, journal_id, issue_id):
-    from wtforms import fields, form
-
-    class PagesForm(form.Form):
-        first = fields.TextField()
-        last = fields.TextField()
-
-    class ArticleForm(form.Form):
-        pages = fields.FormField(PagesForm)
+    article_form = articleforms.ArticleForm()
 
     return render_to_response('journalmanager/add_article.html', {
-                              'form': ArticleForm(),
+                              'form': article_form,
                               }, context_instance=RequestContext(request))
