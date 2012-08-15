@@ -1,0 +1,165 @@
+{% extends dynamic_tpl %}
+{% load i18n %}
+{% load static %}
+{% load wtforms %}
+
+
+{% block content %}
+<form method="post" action="#">
+  {% csrf_token %}
+  <span class="label"><a name="title"></a>{% trans "Titles" %}</span>
+  <div class="well">
+
+    <div class="control-group {% if form.titles.errors %}error{% endif %}">
+      {% for title in form_titles %}
+      <label for="{{ title.id }}">
+        <span {% if 'required' in title.flags %}class="req-field"{% endif %}>
+          {% form_field title.label %}
+        </span>
+      </label>
+      <div class="controls">
+        {% form_field title.title %}
+        {% form_field title.language %}
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+
+  <span class="label"><a name="title"></a>{% trans "Analytical Authors" %}</span>
+  <div class="well">
+
+    <div class="control-group {% if form.analytical_authors.errors %}error{% endif %}">
+      {% for analytical_author in form_analytical_authors %}
+      <label for="{{ analytical_author.firstname.id }}">
+        <span {% if 'required' in analytical_author.firstname.flags %}class="req-field"{% endif %}>
+          {% form_field analytical_author.firstname.label %}
+        </span>
+      </label>
+      <div class="controls">
+        {% form_field analytical_author.firstname %}
+      </div>
+
+      <label for="{{ analytical_author.lastname.id }}">
+        <span {% if 'required' in analytical_author.lastname.flags %}class="req-field"{% endif %}>
+          {% form_field analytical_author.lastname.label %}
+        </span>
+      </label>
+      <div class="controls">
+        {% form_field analytical_author.lastname %}
+      </div>
+
+      <label for="{{ analytical_author.role.id }}">
+        <span {% if 'required' in analytical_author.role.flags %}class="req-field"{% endif %}>
+          {% form_field analytical_author.role.label %}
+        </span>
+      </label>
+      <div class="controls">
+        {% form_field analytical_author.role %}
+      </div>
+
+      <label for="{{ analytical_author.affiliations.id }}">
+        <span {% if 'required' in analytical_author.affiliations.flags %}class="req-field"{% endif %}>
+          {% form_field analytical_author.affiliations.label %}
+        </span>
+      </label>
+      <div class="controls">
+        {% form_field analytical_author.affiliations %}
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+
+  <span class="label"><a name="title"></a>{% trans "Corporate Authors" %}</span>
+  <div class="well">
+    <div class="control-group {% if form.corporate_authors.errors %}error{% endif %}">
+      {% for corporate_author in form_corporate_authors %}
+      <label for="{{ corporate_author.institution_name.id }}">
+        <span {% if 'required' in corporate_author.institution_name.flags %}class="req-field"{% endif %}>
+          {% form_field corporate_author.institution_name.label %}
+        </span>
+      </label>
+      <div class="controls">
+        {% form_field corporate_author.institution_name %}
+      </div>
+
+      <label for="{{ corporate_author.divisions.id }}">
+        <span {% if 'required' in corporate_author.divisions.flags %}class="req-field"{% endif %}>
+          {% form_field corporate_author.divisions.label %}
+        </span>
+      </label>
+      <div class="controls">
+        {% form_field corporate_author.divisions %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <span class="label"><a name="title"></a>{% trans "Text language" %}</span>
+  <div class="well">
+    <div class="control-group {% if form.language.errors %}error{% endif %}">
+      <label for="{{ form.language.id }}">
+        <span {% if 'required' in form.language.flags %}class="req-field"{% endif %}>
+          {% form_field form.language.label %}
+        </span>
+      </label>
+      <div class="controls">
+        {% form_field form.language %}
+      </div>
+    </div>
+  </div>
+
+  <span class="label"><a name="title"></a>{% trans "Dates" %}</span>
+  <div class="well">
+    <div class="control-group {% if form.dates.errors %}error{% endif %}">
+      <label for="{{ form.dates.thesis.id }}">
+        <span {% if 'required' in form.dates.thesis.flags %}class="req-field"{% endif %}>
+          {% form_field form.dates.thesis.label %}
+        </span>
+      </label>
+      <div class="controls">
+        {% form_field form.dates.thesis %}
+      </div>
+
+      <label for="{{ form.dates.conference.id }}">
+        <span {% if 'required' in form.dates.conference.flags %}class="req-field"{% endif %}>
+          {% form_field form.dates.conference.label %}
+        </span>
+      </label>
+      <div class="controls">
+        {% form_field form.dates.conference %}
+      </div>
+
+      <label for="{{ form.dates.publication.id }}">
+        <span {% if 'required' in form.dates.publication.flags %}class="req-field"{% endif %}>
+          {% form_field form.dates.publication.label %}
+        </span>
+      </label>
+      <div class="controls">
+        {% form_field form.dates.publication %}
+      </div>
+
+      <label for="{{ form.dates.revision.id }}">
+        <span {% if 'required' in form.dates.revision.flags %}class="req-field"{% endif %}>
+          {% form_field form.dates.revision.label %}
+        </span>
+      </label>
+      <div class="controls">
+        {% form_field form.dates.revision %}
+      </div>
+    </div>
+  </div>
+
+  <div class="row-fluid">
+    <input class="btn btn-primary"
+           name="submit"
+           type="submit"
+           value="{% trans "save" %}"/>
+    <input class="btn btn-warning"
+           type="reset"
+           value="{% trans "cancel" %}"/>
+  </div>
+</form>
+{% endblock %}
+

@@ -38,7 +38,7 @@ class AnalyticalAuthorForm(form.Form):
 
 
 class CorporateAuthorForm(form.Form):
-    name = fields.TextField('Name')
+    institution_name = fields.TextField('Name')
     divisions = fields.FieldList(fields.TextField(),
                                  min_entries=1)
 
@@ -49,11 +49,13 @@ class TitleForm(form.Form):
 
 
 class ArticleForm(form.Form):
-    analytical_authors = fields.FieldList(fields.FormField(AnalyticalAuthorForm))
-    corporate_authors = fields.FieldList(fields.FormField(CorporateAuthorForm))
-    titles = fields.FieldList(fields.FormField(TitleForm))
+    analytical_authors = fields.FieldList(fields.FormField(AnalyticalAuthorForm),
+                                          min_entries=1)
+    corporate_authors = fields.FieldList(fields.FormField(CorporateAuthorForm),
+                                         min_entries=1)
+    titles = fields.FieldList(fields.FormField(TitleForm), min_entries=1)
     pages = fields.FormField(PagesForm)
-    language = fields.TextField('Language')
+    language = fields.SelectField('Language', choices=[('pt', 'Portuguese')])
     dates = fields.FormField(DatesForm)
     publication_city = fields.TextField('City of publication')
     publication_state = fields.TextField('State of publication')
