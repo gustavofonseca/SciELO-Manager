@@ -11,17 +11,25 @@
   <div class="well">
 
     <div class="control-group {% if form.titles.errors %}error{% endif %}">
-      {% for title in form_titles %}
-      <label for="{{ title.id }}">
-        <span {% if 'required' in title.flags %}class="req-field"{% endif %}>
-          {% form_field title.label %}
-        </span>
-      </label>
-      <div class="controls">
-        {% form_field title.title %}
-        {% form_field title.language %}
-      </div>
-      {% endfor %}
+      <table id="titleformset" class="table table-bordered table-striped">
+        <tr>
+          <td>{% trans 'Title' %}</td>
+          <td>{% trans 'Language'%}</td>
+        </tr>
+        {% for title in form_titles %}
+        <tr>
+          <td>
+            {% form_field title.title %}
+          </td>
+          <td>{% form_field title.language %}</td>
+        </tr>
+        {% endfor %}
+      </table>
+      <p>
+        <input id="id_titles-TOTAL_FORMS" type="hidden" value="1" name="titles-TOTAL_FORMS">
+        <input id="id_titles-INITIAL_FORMS" type="hidden" value="0" name="titles-INITIAL_FORMS">
+        <input id="id_titles-MAX_NUM_FORMS" type="hidden" name="titles-MAX_NUM_FORMS">
+      </p>
     </div>
 
   </div>
@@ -31,20 +39,12 @@
 
     <div class="control-group {% if form.analytical_authors.errors %}error{% endif %}">
       {% for analytical_author in form_analytical_authors %}
-      <label for="{{ analytical_author.firstname.id }}">
-        <span {% if 'required' in analytical_author.firstname.flags %}class="req-field"{% endif %}>
-          {% form_field analytical_author.firstname.label %}
-        </span>
-      </label>
+      {% form_field analytical_author.firstname.label %}
       <div class="controls">
         {% form_field analytical_author.firstname %}
       </div>
 
-      <label for="{{ analytical_author.lastname.id }}">
-        <span {% if 'required' in analytical_author.lastname.flags %}class="req-field"{% endif %}>
-          {% form_field analytical_author.lastname.label %}
-        </span>
-      </label>
+      {% form_field analytical_author.lastname.label %}
       <div class="controls">
         {% form_field analytical_author.lastname %}
       </div>
@@ -279,3 +279,14 @@
 </form>
 {% endblock %}
 
+{% block extrafooter %}
+{{ block.super }}
+ <script>
+  $(document).ready(function() {
+    $('#titleformset tbody tr').formset({
+      formCssClass: 'dynamic-titleformset-form',
+      prefix: 'titles'
+    });
+  });
+</script>
+{% endblock %}
