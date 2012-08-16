@@ -843,10 +843,12 @@ def add_article(request, journal_id, issue_id):
     article_form_titles = iter(article_form.titles)
     article_form_analytical_authors = iter(article_form.analytical_authors)
     article_form_corporate_authors = iter(article_form.corporate_authors)
+    article_form_abstracts = iter(article_form.abstracts)
 
     return render_to_response('journalmanager/add_article.html', {
                               'form': article_form,
                               'form_titles': article_form_titles,
                               'form_analytical_authors': article_form_analytical_authors,
                               'form_corporate_authors': article_form_corporate_authors,
+                              'form_article_form_abstracts': article_form_abstracts,
                               }, context_instance=RequestContext(request))

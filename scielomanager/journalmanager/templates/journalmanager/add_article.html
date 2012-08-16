@@ -26,7 +26,7 @@
 
   </div>
 
-  <span class="label"><a name="title"></a>{% trans "Analytical Authors" %}</span>
+  <span class="label"></a>{% trans "Analytical authors" %}</span>
   <div class="well">
 
     <div class="control-group {% if form.analytical_authors.errors %}error{% endif %}">
@@ -71,7 +71,7 @@
 
   </div>
 
-  <span class="label"><a name="title"></a>{% trans "Corporate Authors" %}</span>
+  <span class="label"></a>{% trans "Corporate authors" %}</span>
   <div class="well">
     <div class="control-group {% if form.corporate_authors.errors %}error{% endif %}">
       {% for corporate_author in form_corporate_authors %}
@@ -96,7 +96,7 @@
     </div>
   </div>
 
-  <span class="label"><a name="title"></a>{% trans "Text language" %}</span>
+  <span class="label"></a>{% trans "Text language" %}</span>
   <div class="well">
     <div class="control-group {% if form.language.errors %}error{% endif %}">
       <label for="{{ form.language.id }}">
@@ -110,7 +110,7 @@
     </div>
   </div>
 
-  <span class="label"><a name="title"></a>{% trans "Dates" %}</span>
+  <span class="label"></a>{% trans "Dates" %}</span>
   <div class="well">
     <div class="control-group {% if form.dates.errors %}error{% endif %}">
       <label for="{{ form.dates.thesis.id }}">
@@ -147,6 +147,122 @@
       </label>
       <div class="controls">
         {% form_field form.dates.revision %}
+      </div>
+    </div>
+  </div>
+
+  <span class="label">{% trans "Publication address" %}</span>
+  <div class="well">
+
+    <div class="control-group {% if form.publication_city.errors %}error{% endif %}">
+      <label for="{{ form.publication_city.id }}">
+        <span {% if 'required' in form.publication_city.flags %}class="req-field"{% endif %}>
+          {% form_field form.publication_city.label %}
+        </span>
+      </label>
+      <div class="controls">
+        {% form_field form.publication_city %}
+      </div>
+    </div>
+
+    <div class="control-group {% if form.publication_state.errors %}error{% endif %}">
+      <label for="{{ form.publication_state.id }}">
+        <span {% if 'required' in form.publication_state.flags %}class="req-field"{% endif %}>
+          {% form_field form.publication_state.label %}
+        </span>
+      </label>
+      <div class="controls">
+        {% form_field form.publication_state %}
+      </div>
+    </div>
+
+    <div class="control-group {% if form.publication_country.errors %}error{% endif %}">
+      <label for="{{ form.publication_country.id }}">
+        <span {% if 'required' in form.publication_country.flags %}class="req-field"{% endif %}>
+          {% form_field form.publication_country.label %}
+        </span>
+      </label>
+      <div class="controls">
+        {% form_field form.publication_country %}
+      </div>
+    </div>
+  </div>
+
+  <div class="well">
+
+    <div class="control-group {% if form.doctopic.errors %}error{% endif %}">
+      <label for="{{ form.doctopic.id }}">
+        <span {% if 'required' in form.doctopic.flags %}class="req-field"{% endif %}>
+          {% form_field form.doctopic.label %}
+        </span>
+      </label>
+      <div class="controls">
+        {% form_field form.doctopic %}
+      </div>
+    </div>
+
+    <div class="control-group {% if form.type_literature.errors %}error{% endif %}">
+      <label for="{{ form.type_literature.id }}">
+        <span {% if 'required' in form.type_literature.flags %}class="req-field"{% endif %}>
+          {% form_field form.type_literature.label %}
+        </span>
+      </label>
+      <div class="controls">
+        {% form_field form.type_literature %}
+      </div>
+    </div>
+
+    <div class="control-group {% if form.bibliographic_standard.errors %}error{% endif %}">
+      <label for="{{ form.bibliographic_standard.id }}">
+        <span {% if 'required' in form.bibliographic_standard.flags %}class="req-field"{% endif %}>
+          {% form_field form.bibliographic_standard.label %}
+        </span>
+      </label>
+      <div class="controls">
+        {% form_field form.bibliographic_standard %}
+      </div>
+    </div>
+  </div>
+
+  <span class="label">{% trans "Abstract" %}</span>
+  <div class="well">
+    {% for abstract in form_article_form_abstracts %}
+    <div class="control-group {% if abstract.abstract.errors %}error{% endif %}">
+      <label for="{{ abstract.id }}">
+        <span {% if 'required' in abstract.abstract.flags %}class="req-field"{% endif %}>
+          {% form_field abstract.abstract.label %}
+        </span>
+      </label>
+      <div class="controls">
+        {% form_field abstract.abstract %}
+        {% form_field abstract.language %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="well">
+    <div class="control-group {% if form.sponsor.errors %}error{% endif %}">
+      <label for="{{ form.sponsor.id }}">
+        <span {% if 'required' in form.sponsor.flags %}class="req-field"{% endif %}>
+          {% form_field form.sponsor.label %}
+        </span>
+      </label>
+      <div class="controls">
+        {% form_field form.sponsor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="well">
+    <div class="control-group {% if form.pid.errors %}error{% endif %}">
+      <label for="{{ form.pid.id }}">
+        <span {% if 'required' in form.pid.flags %}class="req-field"{% endif %}>
+          {% form_field form.pid.label %}
+        </span>
+      </label>
+      <div class="controls">
+        {% form_field form.pid %}
       </div>
     </div>
   </div>

@@ -8,7 +8,7 @@ from wtforms import (
 
 class AbstractForm(form.Form):
     language = fields.SelectField('Language', choices=[('pt', 'Portuguese')])
-    abstract = fields.TextField('Title')
+    abstract = fields.TextField('Abstract')
 
 
 class DatesForm(form.Form):
@@ -61,7 +61,7 @@ class ArticleForm(form.Form):
     publication_state = fields.TextField('State of publication')
     publication_country = fields.TextField('Country of publication')
     doctopic = fields.TextField('Doctopic')
-    abstracts = fields.FieldList(fields.FormField(AbstractForm))
+    abstracts = fields.FieldList(fields.FormField(AbstractForm), min_entries=1)
     created_at = fields.DateField()
     bibliographic_standard = fields.TextField('Bibliographic standard')
     sponsor = fields.TextField()
