@@ -837,13 +837,16 @@ def trash_listing(request):
 
 def add_article(request, journal_id, issue_id):
 
-    #  django templates doesn't extract the iterator the way pure python does. so,
-    #  we are doing it in pure python realms.
-    article_form = articleforms.ArticleForm()
-    article_form_titles = iter(article_form.titles)
-    article_form_analytical_authors = iter(article_form.analytical_authors)
-    article_form_corporate_authors = iter(article_form.corporate_authors)
-    article_form_abstracts = iter(article_form.abstracts)
+    if request.method == 'POST':
+        pass
+    else:
+        #  django templates doesn't extract the iterator the way pure python does. so,
+        #  we are doing it in pure python realms.
+        article_form = articleforms.ArticleForm()
+        article_form_titles = iter(article_form.titles)
+        article_form_analytical_authors = iter(article_form.analytical_authors)
+        article_form_corporate_authors = iter(article_form.corporate_authors)
+        article_form_abstracts = iter(article_form.abstracts)
 
     return render_to_response('journalmanager/add_article.html', {
                               'form': article_form,

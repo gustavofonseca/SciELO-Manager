@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load static %}
 {% load wtforms %}
+{% load fake_management_form %}
 
 
 {% block content %}
@@ -26,9 +27,7 @@
         {% endfor %}
       </table>
       <p>
-        <input id="id_titles-TOTAL_FORMS" type="hidden" value="1" name="titles-TOTAL_FORMS">
-        <input id="id_titles-INITIAL_FORMS" type="hidden" value="0" name="titles-INITIAL_FORMS">
-        <input id="id_titles-MAX_NUM_FORMS" type="hidden" name="titles-MAX_NUM_FORMS">
+        {% fake_management_form 'titles' form_titles %}
       </p>
     </div>
 
