@@ -37,35 +37,23 @@
   <div class="well">
 
     <div class="control-group {% if form.analytical_authors.errors %}error{% endif %}">
-      {% for analytical_author in form_analytical_authors %}
-      {% form_field analytical_author.firstname.label %}
-      <div class="controls">
-        {% form_field analytical_author.firstname %}
-      </div>
-
-      {% form_field analytical_author.lastname.label %}
-      <div class="controls">
-        {% form_field analytical_author.lastname %}
-      </div>
-
-      <label for="{{ analytical_author.role.id }}">
-        <span {% if 'required' in analytical_author.role.flags %}class="req-field"{% endif %}>
-          {% form_field analytical_author.role.label %}
-        </span>
-      </label>
-      <div class="controls">
-        {% form_field analytical_author.role %}
-      </div>
-
-      <label for="{{ analytical_author.affiliations.id }}">
-        <span {% if 'required' in analytical_author.affiliations.flags %}class="req-field"{% endif %}>
-          {% form_field analytical_author.affiliations.label %}
-        </span>
-      </label>
-      <div class="controls">
-        {% form_field analytical_author.affiliations %}
-      </div>
-      {% endfor %}
+      <table id="analyticalauthorformset" class="table table-bordered table-striped">
+        <tr>
+          <td>{% trans 'Firstname' %}</td>
+          <td>{% trans 'Lastname' %}</td>
+          <td>{% trans 'Role' %}</td>
+        </tr>
+        {% for analytical_author in form_analytical_authors %}
+        <tr>
+          <td>{% form_field analytical_author.firstname %}</td>
+          <td>{% form_field analytical_author.lastname %}</td>
+          <td>{% form_field analytical_author.role %}</td>
+        </tr>
+        {% endfor %}
+      </table>
+      <p>
+        {% fake_management_form 'analytical_authors' form_analytical_authors %}
+      </p>
     </div>
 
   </div>
@@ -73,25 +61,20 @@
   <span class="label"></a>{% trans "Corporate authors" %}</span>
   <div class="well">
     <div class="control-group {% if form.corporate_authors.errors %}error{% endif %}">
-      {% for corporate_author in form_corporate_authors %}
-      <label for="{{ corporate_author.institution_name.id }}">
-        <span {% if 'required' in corporate_author.institution_name.flags %}class="req-field"{% endif %}>
-          {% form_field corporate_author.institution_name.label %}
-        </span>
-      </label>
-      <div class="controls">
-        {% form_field corporate_author.institution_name %}
-      </div>
 
-      <label for="{{ corporate_author.divisions.id }}">
-        <span {% if 'required' in corporate_author.divisions.flags %}class="req-field"{% endif %}>
-          {% form_field corporate_author.divisions.label %}
-        </span>
-      </label>
-      <div class="controls">
-        {% form_field corporate_author.divisions %}
-      </div>
-      {% endfor %}
+      <table id="corporateauthorformset" class="table table-bordered table-striped">
+        <tr>
+          <td>{% trans 'Institution name' %}</td>
+        </tr>
+        {% for corporate_author in form_corporate_authors %}
+        <tr>
+          <td>{% form_field corporate_author.institution_name %}</td>
+        </tr>
+        {% endfor %}
+      </table>
+      <p>
+        {% fake_management_form 'corporate_authors' form_corporate_authors %}
+      </p>
     </div>
   </div>
 
@@ -225,19 +208,24 @@
 
   <span class="label">{% trans "Abstract" %}</span>
   <div class="well">
-    {% for abstract in form_article_form_abstracts %}
+
     <div class="control-group {% if abstract.abstract.errors %}error{% endif %}">
-      <label for="{{ abstract.id }}">
-        <span {% if 'required' in abstract.abstract.flags %}class="req-field"{% endif %}>
-          {% form_field abstract.abstract.label %}
-        </span>
-      </label>
-      <div class="controls">
-        {% form_field abstract.abstract %}
-        {% form_field abstract.language %}
-      </div>
+      <table id="abstractsformset" class="table table-bordered table-striped">
+        <tr>
+          <td>{% trans 'Abstract' %}</td>
+          <td>{% trans 'Language' %}</td>
+        </tr>
+        {% for abstract in form_article_form_abstracts %}
+        <tr>
+          <td>{% form_field abstract.abstract %}</td>
+          <td>{% form_field abstract.language %}</td>
+        </tr>
+        {% endfor %}
+      </table>
+      <p>
+        {% fake_management_form 'abstracts' form_article_form_abstracts %}
+      </p>
     </div>
-    {% endfor %}
   </div>
 
   <div class="well">
@@ -285,6 +273,21 @@
     $('#titleformset tbody tr').formset({
       formCssClass: 'dynamic-titleformset-form',
       prefix: 'titles'
+    });
+
+    $('#analyticalauthorformset tbody tr').formset({
+      formCssClass: 'dynamic-titleformset-form',
+      prefix: 'analytical_authors'
+    });
+
+    $('#corporateauthorformset tbody tr').formset({
+      formCssClass: 'dynamic-titleformset-form',
+      prefix: 'corporate_authors'
+    });
+
+    $('#abstractsformset tbody tr').formset({
+      formCssClass: 'dynamic-titleformset-form',
+      prefix: 'abstracts'
     });
   });
 </script>

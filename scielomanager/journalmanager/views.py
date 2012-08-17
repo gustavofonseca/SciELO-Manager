@@ -835,13 +835,14 @@ def trash_listing(request):
         context_instance = RequestContext(request))
 
 
+@permission_required('journalmanager.change_article', login_url=settings.LOGIN_URL)
 def add_article(request, journal_id, issue_id):
 
     if request.method == 'POST':
         pass
     else:
-        #  django templates doesn't extract the iterator the way pure python does. so,
-        #  we are doing it in pure python realms.
+        #  django templates doesn't extract the iterator the way python does.
+        #  so we are doing it in python realms.
         article_form = articleforms.ArticleForm()
         article_form_titles = iter(article_form.titles)
         article_form_analytical_authors = iter(article_form.analytical_authors)
