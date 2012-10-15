@@ -18,11 +18,11 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import render_to_response
 from django.template import loader
 from django.template.context import RequestContext
+from django.template.response import TemplateResponse
 from django.utils.translation import ugettext as _
 from django.utils.functional import curry
 from django.utils.html import escape
 from django.forms.models import inlineformset_factory
-from django.conf import settings
 
 from scielomanager.journalmanager import models
 from scielomanager.journalmanager.forms import *
@@ -351,20 +351,76 @@ def edit_journal_status(request, journal_id=None):
                               }, context_instance=RequestContext(request))
 
 
+def pend_data_form(decorated):
+    """
+    Make possible for the view-function to ``pend`` and
+    ``resume`` a POST request.
+
+    Constraints:
+      * The view-function must return a `TemplateResponse
+      <https://docs.djangoproject.com/en/1.3/ref/template-response/>`_
+      object;
+      * The view-function must accept ``**kwargs``, because the
+      decorator injects some state in the view.
+
+    The param ``kwargs['is_resuming']`` informs the view-function if
+    we are processing a resume operation or a simple new form.
+
+    ``form_hash`` is added to the context and contains the pended
+    form id, needed to retrieve the form state.
+    """
+    def _decorator(request, *args, **kwargs):
+        #  defaults
+        kwargs['is_resuming'] = False
+
+        if request.method == 'POST':
+
+            if 'pend' in request.POST:  # pend a post queryset
+                journal_form_hash = PendingPostData(request.POST).pend(
+                    resolve(request.get_full_path()).url_name, request.user)
+
+                messages.info(request, MSG_FORM_SAVED_PARTIALLY)
+
+                response = decorated(request, *args, **kwargs)
+                response.context_data['form_hash'] = journal_form_hash
+
+            else:  # the form is evaluated by the view
+                response = decorated(request, *args, **kwargs)
+
+                if request.POST.get('form_hash', None) and request.POST['form_hash'] != 'None':
+                    models.PendedForm.objects.get(form_hash=request.POST['form_hash']).delete()
+
+        else:
+            if 'resume' in request.GET:
+                request.POST = PendingPostData.resume(request.GET.get('resume'))
+                kwargs['is_resuming'] = True
+
+            response = decorated(request, *args, **kwargs)
+            response.context_data['form_hash'] = request.GET.get('resume', None)
+
+        return response
+
+    return _decorator
+
+
 @permission_required('journalmanager.change_journal', login_url=AUTHZ_REDIRECT_URL)
-def add_journal(request, journal_id=None):
+@pend_data_form
+def add_journal(request, journal_id=None, **kwargs):
     """
     Handles new and existing journals
+
+    This view-function must return a `TemplateResponse
+    <https://docs.djangoproject.com/en/1.3/ref/template-response/>`_
+    object, because it is a requirement for the pended engine to work
+    correctly.
     """
 
     user_collections = models.get_user_collections(request.user.id)
 
-    if  journal_id is None:
+    if journal_id is None:
         journal = models.Journal()
     else:
         journal = get_object_or_404(models.Journal, id=journal_id)
-
-    form_hash = None
 
     JournalTitleFormSet = inlineformset_factory(models.Journal, models.JournalTitle, form=JournalTitleForm, extra=1, can_delete=True)
     JournalStudyAreaFormSet = inlineformset_factory(models.Journal, models.JournalStudyArea, form=JournalStudyAreaForm, extra=1, can_delete=True)
@@ -376,35 +432,25 @@ def add_journal(request, journal_id=None):
         titleformset = JournalTitleFormSet(request.POST, instance=journal, prefix='title')
         missionformset = JournalMissionFormSet(request.POST, instance=journal, prefix='mission')
 
-        if 'pend' in request.POST:
-            journal_form_hash = PendingPostData(request.POST).pend(resolve(request.get_full_path()).url_name, request.user)
-            form_hash = journal_form_hash
-            messages.info(request, MSG_FORM_SAVED_PARTIALLY)
+        if journalform.is_valid() and studyareaformset.is_valid() and titleformset.is_valid() \
+            and missionformset.is_valid():
+            journalform.save_all(creator=request.user)
+            studyareaformset.save()
+            titleformset.save()
+            missionformset.save()
+            messages.info(request, MSG_FORM_SAVED)
+
+            return HttpResponseRedirect(reverse('journal.index'))
         else:
-
-            if journalform.is_valid() and studyareaformset.is_valid() and titleformset.is_valid() \
-                and missionformset.is_valid():
-                journalform.save_all(creator=request.user)
-                studyareaformset.save()
-                titleformset.save()
-                missionformset.save()
-                messages.info(request, MSG_FORM_SAVED)
-
-                if request.POST.get('form_hash', None) and request.POST['form_hash'] != 'None':
-                    models.PendedForm.objects.get(form_hash=request.POST['form_hash']).delete()
-
-                return HttpResponseRedirect(reverse('journal.index'))
-            else:
-                messages.error(request, MSG_FORM_MISSING)
+            messages.error(request, MSG_FORM_MISSING)
 
     else:
-        if request.GET.get('resume', None):
-            pended_post_data = PendingPostData.resume(request.GET.get('resume'))
 
-            journalform = JournalForm(pended_post_data,  request.FILES, instance=journal, prefix='journal', collections_qset=user_collections)
-            studyareaformset = JournalStudyAreaFormSet(pended_post_data, instance=journal, prefix='studyarea')
-            titleformset = JournalTitleFormSet(pended_post_data, instance=journal, prefix='title')
-            missionformset = JournalMissionFormSet(pended_post_data, instance=journal, prefix='mission')
+        if kwargs.get('is_resuming', None):
+            journalform = JournalForm(request.POST, instance=journal, prefix='journal', collections_qset=user_collections)
+            studyareaformset = JournalStudyAreaFormSet(request.POST, instance=journal, prefix='studyarea')
+            titleformset = JournalTitleFormSet(request.POST, instance=journal, prefix='title')
+            missionformset = JournalMissionFormSet(request.POST, instance=journal, prefix='mission')
         else:
             journalform = JournalForm(instance=journal, prefix='journal', collections_qset=user_collections)
             studyareaformset = JournalStudyAreaFormSet(instance=journal, prefix='studyarea')
@@ -423,16 +469,15 @@ def add_journal(request, journal_id=None):
     except ValueError:
         has_logo_url = False
 
-    return render_to_response('journalmanager/add_journal.html', {
+    return TemplateResponse(request, 'journalmanager/add_journal.html', {
                               'add_form': journalform,
                               'studyareaformset': studyareaformset,
                               'titleformset': titleformset,
                               'missionformset': missionformset,
                               'has_cover_url': has_cover_url,
                               'has_logo_url': has_logo_url,
-                              'form_hash': form_hash if form_hash else request.GET.get('resume', None),
                               'is_new': False if journal_id else True,
-                              }, context_instance=RequestContext(request))
+                              })
 
 
 @login_required
