@@ -372,6 +372,7 @@ def pend_data_form(decorated):
     def _decorator(request, *args, **kwargs):
         #  defaults
         kwargs['is_resuming'] = False
+        kwargs['is_pending'] = False
 
         if request.method == 'POST':
 
@@ -381,6 +382,7 @@ def pend_data_form(decorated):
 
                 messages.info(request, MSG_FORM_SAVED_PARTIALLY)
 
+                kwargs['is_pending'] = True
                 response = decorated(request, *args, **kwargs)
                 response.context_data['form_hash'] = journal_form_hash
 
@@ -427,6 +429,7 @@ def add_journal(request, journal_id=None, **kwargs):
     JournalMissionFormSet = inlineformset_factory(models.Journal, models.JournalMission, form=JournalMissionForm, extra=1, can_delete=True)
 
     if request.method == "POST":
+
         journalform = JournalForm(request.POST,  request.FILES, instance=journal, prefix='journal', collections_qset=user_collections)
         studyareaformset = JournalStudyAreaFormSet(request.POST, instance=journal, prefix='studyarea')
         titleformset = JournalTitleFormSet(request.POST, instance=journal, prefix='title')
@@ -441,7 +444,8 @@ def add_journal(request, journal_id=None, **kwargs):
             messages.info(request, MSG_FORM_SAVED)
 
             return HttpResponseRedirect(reverse('journal.index'))
-        else:
+
+        elif not kwargs.get('is_pending', False):
             messages.error(request, MSG_FORM_MISSING)
 
     else:
