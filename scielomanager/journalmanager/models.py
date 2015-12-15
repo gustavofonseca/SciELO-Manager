@@ -497,6 +497,41 @@ class StudyArea(models.Model):
         return self.study_area
 
 
+class PublishingHouse(models.Model):
+    """ A casa publicadora, pessoa ou instituição responsável pela produção
+    editorial de uma publicação.
+
+    Eventualmente, ocorrerão entidades duplicadas para esse tipo com algum
+    nível de inconsistência entre si, mas faz parte do design da solução.
+
+    Para recuperar os periódicos de responsabilidade de uma determinada instância
+    de `PublishingHouse`, use o atributo `instancia.journals_i_lead.all()`. Para
+    os periódicos operados pela instância, use o atributo
+    `instancia.journals.all()`.
+    """
+    name = models.CharField(_('Name'), max_length=512)
+    address = models.CharField(_('Address'), max_length=512, default='',
+            blank=True)
+    city = models.CharField(_('City'), max_length=256)
+    state = models.CharField(_('State/Province/Region'), max_length=128,
+            default='', blank=True)
+    zipcode = models.CharField(_('Zip/Postal Code'), max_length=64,
+            default='', blank=True)
+    country = modelfields.CountryField(_('Country'), default='', blank=True)
+    email = models.EmailField(_('E-mail'), default='', blank=True)
+    phone1 = models.CharField(_('Phone #1'), max_length=32, default='',
+            blank=True)
+    phone2 = models.CharField(_('Phone #2'), max_length=32, default='',
+            blank=True)
+
+    def __repr__(self):
+        return '<%s pk="%s" name="%s" city="%s">' % (self.__class__.__name__,
+                self.pk, self.name, self.city)
+
+    def __unicode__(self):
+        return ' '.join([self.name, self.city])
+
+
 class Journal(models.Model):
     """
     Represents a Journal that is managed by one SciELO Collection.
@@ -610,6 +645,12 @@ class Journal(models.Model):
             db_index=True)
     other_previous_title = models.CharField(_('Other Previous Title'),
             max_length=255, default='', blank=True)
+
+    chief_publishing_house = models.ForeignKey(PublishingHouse, null=True,
+            verbose_name=_('Chief publishing house'), related_name='journals_i_lead')
+    publishing_house = models.ForeignKey(PublishingHouse, null=True, blank=True,
+            verbose_name=_('Publishing house'), related_name='journals')
+
     editor_name = models.CharField(_('Editor Names'), max_length=512)
     editor_address = models.CharField(_('Editor Address'), max_length=512)
     editor_address_city = models.CharField(_('Editor City'), max_length=256)
@@ -622,11 +663,13 @@ class Journal(models.Model):
     editor_phone2 = models.CharField(_('Editor Phone 2'), null=True, blank=True,
             max_length=32)
     editor_email = models.EmailField(_('Editor E-mail'))
+
     publisher_name = models.CharField(_('Publisher Name'), max_length=256)
     publisher_country = modelfields.CountryField(_('Publisher Country'))
     publisher_state = models.CharField(_('Publisher State/Province/Region'),
             max_length=64)
     publication_city = models.CharField(_('Publication City'), max_length=64)
+
     is_indexed_scie = models.BooleanField(_('SCIE'), default=False)
     is_indexed_ssci = models.BooleanField(_('SSCI'), default=False)
     is_indexed_aehci = models.BooleanField(_('A&HCI'), default=False)
