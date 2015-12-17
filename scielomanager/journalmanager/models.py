@@ -651,19 +651,6 @@ class Journal(models.Model):
     publishing_house = models.ForeignKey(PublishingHouse, null=True, blank=True,
             verbose_name=_('Publishing house'), related_name='journals')
 
-    editor_name = models.CharField(_('Editor Names'), max_length=512)
-    editor_address = models.CharField(_('Editor Address'), max_length=512)
-    editor_address_city = models.CharField(_('Editor City'), max_length=256)
-    editor_address_state = models.CharField(_('Editor State/Province/Region'),
-            max_length=128)
-    editor_address_zip = models.CharField(_('Editor Zip/Postal Code'),
-            max_length=64)
-    editor_address_country = modelfields.CountryField(_('Editor Country'))
-    editor_phone1 = models.CharField(_('Editor Phone 1'), max_length=32)
-    editor_phone2 = models.CharField(_('Editor Phone 2'), null=True, blank=True,
-            max_length=32)
-    editor_email = models.EmailField(_('Editor E-mail'))
-
     publisher_name = models.CharField(_('Publisher Name'), max_length=256)
     publisher_country = modelfields.CountryField(_('Publisher Country'))
     publisher_state = models.CharField(_('Publisher State/Province/Region'),
@@ -774,6 +761,36 @@ class Journal(models.Model):
         rel.reason = reason
         rel.created_by = responsible
         rel.save()
+
+    @property
+    def editor_address(self):
+        """ abordagem para compatibilidade
+        """
+        return self.chief_publishing_house.address
+
+    @property
+    def editor_address_city(self):
+        return self.chief_publishing_house.city
+
+    @property
+    def editor_address_state(self):
+        return self.chief_publishing_house.state
+
+    @property
+    def editor_address_country(self):
+        return self.chief_publishing_house.country
+
+    @property
+    def editor_address_zip(self):
+        return self.chief_publishing_house.zipcode
+
+    @property
+    def editor_phone1(self):
+        return self.chief_publishing_house.phone1
+
+    @property
+    def editor_phone2(self):
+        return self.chief_publishing_house.phone2
 
 
 class Membership(models.Model):

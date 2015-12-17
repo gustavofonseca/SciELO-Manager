@@ -9,6 +9,8 @@ urlpatterns = patterns('',
     # Journal Tools
     url(r'^$', views.journal_index, name="journal.index"),
     url(r'^new/$', views.add_journal, name='journal.add'),
+    url(r'^new2/$', views.JournalWizard.as_view(views.JOURNAL_WIZARD_FORMS),
+        name='journal.add2'),
     url(r'^(?P<journal_id>\d+)/dash/$', views.dash_journal, name='journal.dash'),
     url(r'^(?P<journal_id>\d+)/edit/$', views.add_journal, name='journal.edit'),
     url(r'^(?P<object_id>\d+)/toggle_availability/$', views.generic_toggle_availability,

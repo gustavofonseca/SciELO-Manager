@@ -3,11 +3,6 @@ import json
 import urlparse
 from datetime import datetime
 
-try:
-    from collections import OrderedDict
-except ImportError:
-    from ordereddict import OrderedDict
-
 import operator
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
@@ -16,6 +11,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from django.contrib import messages
+from django.contrib.formtools.wizard.views import SessionWizardView
 from django.core.urlresolvers import reverse
 from django.core.urlresolvers import resolve
 from django.http import HttpResponse
@@ -578,6 +574,21 @@ def edit_journal_status(request, journal_id=None):
                               'journal_history': journal_history,
                               'journal': journal,
                               }, context_instance=RequestContext(request))
+
+
+class JournalWizard(SessionWizardView):
+    map = {
+            'base': (JournalForm, 'journalmanager/add_journal.html'),
+            'publishing_houses': (PublishingHouse, 'journalmanager/add_journal_pubhouse.html'),
+    }
+
+    def get_template_names(self):
+        return [self.map[self.steps.current][1]]
+
+    def done(self, form_list, **kwargs):
+        import pdb; pdb.set_trace()
+
+JOURNAL_WIZARD_FORMS = [(key, item[0]) for key, item JournalWizard.map.items()]
 
 
 @permission_required('journalmanager.change_journal', login_url=settings.AUTHZ_REDIRECT_URL)

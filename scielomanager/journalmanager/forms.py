@@ -3,7 +3,6 @@ import re
 import logging
 
 from django import forms
-from django.forms import ModelForm
 from django.forms.models import BaseInlineFormSet
 from django.forms.models import inlineformset_factory
 from django.utils.translation import ugettext_lazy as _
@@ -53,7 +52,7 @@ class UserChangeForm(UserChangeForm):
         return email
 
 
-class UserCollectionContext(ModelForm):
+class UserCollectionContext(forms.ModelForm):
     """
     Inherit from this base class if you have a ``collections`` attribute
     that needs to be contextualized with user collections.
@@ -79,7 +78,7 @@ class UserCollectionContext(ModelForm):
                 pk__in=(collection.collection.pk for collection in collections_qset))
 
 
-class AheadForm(ModelForm):
+class AheadForm(forms.ModelForm):
 
     class Meta():
         model = models.Journal
@@ -90,32 +89,20 @@ class AheadForm(ModelForm):
            }
 
 
-class RestrictedJournalForm(ModelForm):
+class RestrictedJournalForm(forms.ModelForm):
 
     class Meta:
         model = models.Journal
         fields = ['use_license', 'is_indexed_scie', 'is_indexed_ssci',
-                'is_indexed_aehci', 'index_coverage', 'editor_name',
-                'editor_address', 'editor_address_city', 'editor_address_state',
-                'editor_address_zip', 'editor_address_country', 'editor_phone1',
-                'editor_phone2', 'editor_email', 'publisher_name', 'publisher_country',
-                'publisher_state', 'publication_city']
+                'is_indexed_aehci', 'index_coverage', 'publisher_name',
+                'publisher_country', 'publisher_state', 'publication_city']
 
         widgets = {
             'index_coverage': forms.Textarea(attrs={'class': 'span12', 'rows': '6'}),
-            'editor_name': forms.TextInput(attrs={'class': 'span12'}),
-            'editor_address': forms.TextInput(attrs={'class': 'span12'}),
-            'editor_address_city': forms.TextInput(attrs={'class': 'span12'}),
-            'editor_address_state': forms.TextInput(attrs={'class': 'span12'}),
-            'editor_address_zip': forms.TextInput(attrs={'class': 'span12'}),
-            'editor_address_country': forms.Select(attrs={'class': 'chzn-select span12'}),
-            'editor_phone1': forms.TextInput(attrs={'class': 'span12'}),
-            'editor_phone2': forms.TextInput(attrs={'class': 'span12'}),
-            'editor_email': forms.TextInput(attrs={'class': 'span12'}),
         }
 
 
-class JournalForm(ModelForm):
+class JournalForm(forms.ModelForm):
     print_issn = fields.ISSNField(max_length=9, required=False)
     eletronic_issn = fields.ISSNField(max_length=9, required=False)
     languages = forms.ModelMultipleChoiceField(models.Language.objects.all(),
@@ -231,9 +218,11 @@ class JournalForm(ModelForm):
         return logo
 
     class Meta:
-
         model = models.Journal
-        exclude = ('collections', 'previous_ahead_documents', 'current_ahead_documents')
+        exclude = ('collections', 'previous_ahead_documents',
+                'current_ahead_documents', 'chief_publishing_house',
+                'publishing_house')
+
         # Overriding the default field types or widgets
         widgets = {
             'title': forms.TextInput(attrs={'class': 'span9'}),
@@ -264,7 +253,12 @@ class JournalForm(ModelForm):
         }
 
 
-class CollectionForm(ModelForm):
+class PublishingHouseForm(forms.ModelForm):
+    class Meta:
+        model = models.PublishingHouse
+
+
+class CollectionForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(CollectionForm, self).__init__(*args, **kwargs)
@@ -297,7 +291,7 @@ class LoginForm(forms.Form):
         password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'input-xlarge focused span4', 'placeholder': _('Password')}))
 
 
-class UserForm(ModelForm):
+class UserForm(forms.ModelForm):
     email = forms.EmailField(label=_("E-mail"), max_length=75, required=True)
     groups = forms.ModelMultipleChoiceField(Group.objects.all(),
         widget=forms.SelectMultiple(attrs={'title': _('Select one or more groups')}),
@@ -327,7 +321,7 @@ class UserForm(ModelForm):
         return user
 
 
-class MembershipForm(ModelForm):
+class MembershipForm(forms.ModelForm):
     status = forms.ChoiceField(widget=forms.Select, choices=choices.JOURNAL_PUBLICATION_STATUS)
     reason = forms.CharField(widget=forms.Textarea)
 
@@ -532,7 +526,7 @@ class SpecialIssueForm(RegularIssueForm):
 # Section
 ###########################################
 
-class SectionTitleForm(ModelForm):
+class SectionTitleForm(forms.ModelForm):
     title = forms.CharField(widget=forms.TextInput(attrs={'class': 'checked_trans'}))
 
     class Meta:
@@ -540,7 +534,7 @@ class SectionTitleForm(ModelForm):
         fields = ('title', 'language',)
 
 
-class SectionForm(ModelForm):
+class SectionForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(SectionForm, self).__init__(*args, **kwargs)
@@ -598,7 +592,7 @@ def get_all_section_forms(post_dict, journal, section):
 # Press Release
 ###########################################
 
-class RegularPressReleaseForm(ModelForm):
+class RegularPressReleaseForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         """
@@ -618,14 +612,14 @@ class RegularPressReleaseForm(ModelForm):
         model = models.RegularPressRelease
 
 
-class AheadPressReleaseForm(ModelForm):
+class AheadPressReleaseForm(forms.ModelForm):
 
     class Meta:
         model = models.AheadPressRelease
         exclude = ('journal',)
 
 
-class PressReleaseTranslationForm(ModelForm):
+class PressReleaseTranslationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         """
@@ -645,13 +639,13 @@ class PressReleaseTranslationForm(ModelForm):
         model = models.PressReleaseTranslation
 
 
-class PressReleaseArticleForm(ModelForm):
+class PressReleaseArticleForm(forms.ModelForm):
 
     class Meta:
         model = models.PressReleaseArticle
 
 
-class AheadPressReleaseArticleForm(ModelForm):
+class AheadPressReleaseArticleForm(forms.ModelForm):
     article_pid = forms.CharField(required=True)
 
     class Meta:
@@ -768,7 +762,7 @@ def get_all_ahead_pressrelease_forms(post_dict, journal, pressrelease):
     return d
 
 
-class UserProfileForm(ModelForm):
+class UserProfileForm(forms.ModelForm):
     class Meta:
         model = models.UserProfile
         fields = ('email_notifications', 'tz', )
@@ -776,7 +770,7 @@ class UserProfileForm(ModelForm):
             'tz': forms.Select(attrs={'class': 'chosen-select',}),
         }
 
-class UserCollectionsForm(ModelForm):
+class UserCollectionsForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         """
         Collection field queryset is overridden to display only
@@ -805,7 +799,7 @@ class UserCollectionsForm(ModelForm):
         }
 
 
-class JournalMissionForm(ModelForm):
+class JournalMissionForm(forms.ModelForm):
     class Meta:
         model = models.JournalMission
         widgets = {
@@ -813,7 +807,7 @@ class JournalMissionForm(ModelForm):
         }
 
 
-class JournalTitleForm(ModelForm):
+class JournalTitleForm(forms.ModelForm):
     class Meta:
         model = models.JournalTitle
         widgets = {
@@ -821,7 +815,7 @@ class JournalTitleForm(ModelForm):
         }
 
 
-class IssueTitleForm(ModelForm):
+class IssueTitleForm(forms.ModelForm):
     class Meta:
         model = models.IssueTitle
         widgets = {
