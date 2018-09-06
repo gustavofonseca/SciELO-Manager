@@ -121,17 +121,17 @@
   {% include "validator/includes/xml_upload_form_validation.html" %}
 
   <script type="text/javascript">
-    $(function () {
       /* fill the iframes with the content of script#content_LANG tags */
-      $('.preview_container').each(function(index, el) {
-        var frame = $(el).find('iframe')[0];
-        var lang = frame.id.split('_')[1];
-        var content = $('#content_' + lang);
-        var iframeDoc = frame.contentWindow.document;
-        iframeDoc.open();
-        iframeDoc.write(content.html());
-        iframeDoc.close();
+      $( document ).ready(function() {
+        $('.preview_container').each(function(index, el) {
+          var frame = $(el).find('iframe')[0];
+          var lang = frame.id.split('_')[1];
+          var content = $('#content_' + lang);
+          var iframeDoc = frame.contentWindow.document;
+          iframeDoc.open();
+          iframeDoc.write(content.html());
+          iframeDoc.close();
+        });
       });
-    });
   </script>
 {% endblock extrafooter %}

@@ -9,7 +9,8 @@ from . import utils
 
 SETTINGS_MAX_UPLOAD_SIZE = settings.VALIDATOR_MAX_UPLOAD_SIZE  # TODO: change to get_settings_or_raise
 PACKTOOLS_VERSION = utils.PACKTOOLS_VERSION  # TODO: change to get_settings_or_raise
-CSS_URL = static('css/htmlgenerator/styles.css')
+CSS_URL = static('css/scielo-article-standalone.css')
+JS_URL = static('js/scielo-article-standalone-min.js')
 
 
 def packtools_home(request, template_name='validator/stylechecker.html'):
@@ -60,7 +61,7 @@ def packtools_preview_html(request, template_name='validator/preview_html.html')
             previews = []
             try:
                 for lang, html_output in packtools.HTMLGenerator.parse(
-                        xml_file, valid_only=False, css=CSS_URL):
+                        xml_file, valid_only=False, css=CSS_URL, js=JS_URL):
                     previews.append({'lang': lang, 'html': html_output})
             except Exception as e:
                 print e.message
