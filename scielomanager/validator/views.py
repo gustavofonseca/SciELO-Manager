@@ -4,6 +4,7 @@ from django.shortcuts import render_to_response
 from django.conf import settings
 from django.templatetags.static import static
 import packtools
+from lxml import etree
 from . import forms
 from . import utils
 
@@ -62,7 +63,9 @@ def packtools_preview_html(request, template_name='validator/preview_html.html')
             try:
                 for lang, html_output in packtools.HTMLGenerator.parse(
                         xml_file, valid_only=False, css=CSS_URL, js=JS_URL):
-                    previews.append({'lang': lang, 'html': html_output})
+                    previews.append({'lang': lang, 'html': etree.tostring(
+                        html_output, encoding='unicode', method='html', 
+                        doctype=u"<!DOCTYPE html>")})
             except Exception as e:
                 print e.message
                 # qualquer exeção aborta a pre-visualização mas continua com o resto
